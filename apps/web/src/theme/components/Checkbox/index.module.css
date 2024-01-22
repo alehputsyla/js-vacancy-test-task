@@ -1,0 +1,21 @@
+.root {
+  &[data-variant='outline-custom'] {
+    .icon {
+      color: var(--checkbox-color);
+      width: calc(var(--checkbox-size) / 3.5);
+    }
+
+    .input {
+      background-color: transparent;
+      border-width: 1.5px;
+      height: calc(var(--checkbox-size) / 1.5);
+      width: calc(var(--checkbox-size) / 1.5);
+    }
+
+    .inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

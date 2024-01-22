@@ -1,8 +1,8 @@
-import { TextInput } from '@mantine/core';
+import { NumberInput } from '@mantine/core';
 
 import classes from './index.module.css';
 
-export default TextInput.extend({
+export default NumberInput.extend({
   classNames: {
     input: classes.input,
   },
