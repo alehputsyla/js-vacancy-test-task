@@ -1,0 +1,56 @@
+.images {
+    --multiplier: calc(100vw / 1440);
+    position: relative;
+    margin-left: calc(76 * var(--multiplier));
+    margin-right: calc(76 * var(--multiplier));
+    margin-bottom: calc(76 * var(--multiplier));
+
+
+    @media (min-width: 1440px) {
+        --multiplier: 1px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    @media (max-width: 767px) {
+        --multiplier: calc(100vw / 767);
+    }
+}
+
+.images .shop {
+    position: relative;
+    z-index: 2;
+
+    @media (min-width: 1440px) {
+        --multiplier: 1px;
+        margin-left: auto;
+        margin-right: auto;
+        height: calc(300 * var(--multiplier));
+    }
+}
+
+.images .card1 {
+    position: absolute;
+    bottom: calc(-39 * var(--multiplier));
+    left: calc(-67 * var(--multiplier));
+    transform: rotate(-15deg);
+    width: calc(100 * var(--multiplier));
+}
+
+.images .card2 {
+    position: absolute;
+    bottom: calc(-39 * var(--multiplier));
+    right: calc(-67 * var(--multiplier));
+    transform: rotate(15deg);
+    width: calc(100 * var(--multiplier));
+}
+
+.space {
+    @media (min-width: 1440px) {
+        display: block;
+    }
+
+    @media (max-width: 767px) {
+        display: block;
+    }
+}
