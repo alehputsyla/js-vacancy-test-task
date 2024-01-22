@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { AppShellHeader as LayoutHeader, Container } from '@mantine/core';
+import { AppShellHeader as LayoutHeader, Container, rem } from '@mantine/core';
 
 import { accountApi } from 'resources/account';
 
@@ -8,8 +8,9 @@ import { RoutePath } from 'routes';
 
 import { LogoImage } from 'public/images';
 
-import UserMenu from './components/UserMenu';
 import ShadowLoginBanner from './components/ShadowLoginBanner';
+import TopBar from './components/TopBar';
+import Buttons from './components/Buttons';
 
 import classes from './index.module.css';
 
@@ -23,16 +24,19 @@ const Header: FC = () => {
       {account.isShadow && <ShadowLoginBanner email={account.email} />}
       <Container
         className={classes.header}
-        mih={72}
-        px={32}
-        py={0}
+        mih={104}
+        p={32}
         display="flex"
         fluid
+        pos="relative"
       >
         <Link type="router" href={RoutePath.Home}>
-          <LogoImage />
+          <LogoImage style={{ height: rem(40) }} />
         </Link>
-        <UserMenu />
+
+        <TopBar />
+
+        <Buttons />
       </Container>
     </LayoutHeader>
   );

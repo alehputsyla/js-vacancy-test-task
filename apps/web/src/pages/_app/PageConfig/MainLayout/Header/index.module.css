@@ -1,8 +1,6 @@
 .header {
-  background-color: var(--mantine-white);
-  border-bottom: 1px solid var(--mantine-color-gray-4);
+  background-color: #FCFCFC;
 
-  flex: 1 1 auto;
   align-items: center;
   justify-content: space-between;
 }

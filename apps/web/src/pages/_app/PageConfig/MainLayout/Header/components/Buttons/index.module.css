@@ -1,0 +1,20 @@
+.button {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.active * {
+  fill: #2B77EB;
+}
+
+.indicator {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 23px;
+  margin-right: 10px;
+  margin-top: 10px;
+}
