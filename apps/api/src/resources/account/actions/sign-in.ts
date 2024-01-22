@@ -11,7 +11,7 @@ import { securityUtil } from 'utils';
 
 const schema = z.object({
   email: z.string().regex(EMAIL_REGEX, 'Email format is incorrect.'),
-  password: z.string().regex(PASSWORD_REGEX, 'The password must contain 6 or more characters with at least one letter (a-z) and one number (0-9).'),
+  password: z.string().regex(PASSWORD_REGEX, 'The password must contain 8 or more characters with at least one number (0-9) and one lover and capital case letter (a-z, A-Z).'),
 });
 
 interface ValidatedData extends z.infer<typeof schema> {
