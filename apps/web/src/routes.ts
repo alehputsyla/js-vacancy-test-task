@@ -12,6 +12,7 @@ export enum RoutePath {
   // Private paths
   Home = '/',
   Profile = '/profile',
+  PaymentSuccessfull = '/payment-successfull',
   PaymentFailed = '/payment-failed',
 
   // Auth paths
@@ -38,6 +39,10 @@ export const routesConfiguration: RoutesConfiguration = {
     layout: LayoutType.MAIN,
   },
   [RoutePath.Profile]: {
+    scope: ScopeType.PRIVATE,
+    layout: LayoutType.MAIN,
+  },
+  [RoutePath.PaymentSuccessfull]: {
     scope: ScopeType.PRIVATE,
     layout: LayoutType.MAIN,
   },
