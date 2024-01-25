@@ -25,7 +25,8 @@ const Header: FC = () => {
       <Container
         className={classes.header}
         mih={104}
-        p={32}
+        py={32}
+        px={48}
         display="flex"
         fluid
         pos="relative"
