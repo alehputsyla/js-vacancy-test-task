@@ -12,17 +12,16 @@
   &[data-variant="outline"] {
     border-color: var(--mantine-color-dark-0);
     color: var(--mantine-color-dark-3);
+    background-color: transparent;
 
     &:hover {
       border-color: var(--mantine-primary-color-4);
       color: var(--mantine-primary-color-4);
-      background-color: transparent;
     }
 
     &:active {
       border-color: var(--mantine-primary-color-4);
       color: var(--mantine-primary-color-8);
-      background-color: transparent;
     }
   }
 
