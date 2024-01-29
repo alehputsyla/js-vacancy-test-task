@@ -1,14 +1,24 @@
-.input {
+.root {
+  --caret-color: inherit;
+  --brd__hover: inherit;
+  --brd__focus: inherit;
+  --brd__filled: inherit;
+}
 
+.input {
   &:hover {
-    border-color: var(--mantine-primary-color-5);
+    border-color: var(--brd__hover);
+  }
+
+  &:focus-within {
+    border-color: var(--brd__focus);
   }
 
   &:has(.innerInput:not(:placeholder-shown):not([value=""])) {
-    border-color: var(--mantine-primary-color-5);
+    border-color: var(--brd__filled);
   }
 }
 
 .innerInput {
-  caret-color: var(--mantine-primary-color-5);
+  caret-color: var(--caret-color);
 }

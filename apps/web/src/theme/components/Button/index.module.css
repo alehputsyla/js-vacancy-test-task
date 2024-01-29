@@ -1,27 +1,40 @@
 .root {
-  background-color: var(--mantine-primary-color-5);
+  &[data-variant='filled'] {
+    --bg: inherit;
+    --bg__hover: inherit;
+    --bg__active: inherit;
 
-  &:hover {
-    background-color: var(--mantine-primary-color-4);
-  }
-
-  &:active {
-    background-color: var(--mantine-primary-color-8);
-  }
-
-  &[data-variant="outline"] {
-    border-color: var(--mantine-color-dark-0);
-    color: var(--mantine-color-dark-3);
-    background-color: transparent;
+    background-color: var(--bg);
 
     &:hover {
-      border-color: var(--mantine-primary-color-4);
-      color: var(--mantine-primary-color-4);
+      background-color: var(--bg__hover);
     }
 
     &:active {
-      border-color: var(--mantine-primary-color-4);
-      color: var(--mantine-primary-color-8);
+      background-color: var(--bg__active);
+    }
+  }
+
+  &[data-variant='outline'] {
+    --brd: inherit;
+    --brd__hover: inherit;
+    --brd__active: inherit;
+    --color: inherit;
+    --color__hover: inherit;
+    --color__active: inherit;
+
+    border-color: var(--brd);
+    color: var(--color);
+    background-color: transparent;
+
+    &:hover {
+      border-color: var(--brd__hover);
+      color: var(--color__hover);
+    }
+
+    &:active {
+      border-color: var(--brd__active);
+      color: var(--color__active);
     }
   }
 
@@ -34,7 +47,7 @@
     }
   }
 
-  &[data-variant='shell-active'] {
+  &[data-variant='shell__active'] {
     background-color: #ECECEE;
     color: var(--mantine-color-black);
   }

@@ -1,12 +1,22 @@
-.input {
-  caret-color: var(--mantine-primary-color-5);
+.root {
+  --caret-color: inherit;
+  --brd__hover: inherit;
+  --brd__focus: inherit;
+  --brd__filled: inherit;
+}
 
-  &:not(:placeholder-shown):not([value=""]) {
-    border-color: var(--mantine-primary-color-5);
+.input {
+  caret-color: var(--caret-color);
+
+  &:hover {
+    border-color: var(--brd__hover);
   }
 
-  &:hover,
   &:focus {
-    border-color: var(--mantine-primary-color-5);
+    border-color: var(--brd__focus);
+  }
+
+  &:not(:placeholder-shown):not([value=""]) {
+    border-color: var(--brd__filled);
   }
 }
