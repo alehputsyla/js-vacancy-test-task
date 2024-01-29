@@ -1,7 +1,8 @@
 import { routeUtil } from 'utils';
 
 import create from './actions/create';
-import uploadPhoto from './actions/upload-photo';
+import remove from './actions/remove';
+import listPersonal from './actions/list-personal';
 
 const publicRoutes = routeUtil.getRoutes([
 
@@ -9,7 +10,8 @@ const publicRoutes = routeUtil.getRoutes([
 
 const privateRoutes = routeUtil.getRoutes([
   create,
-  uploadPhoto,
+  remove,
+  listPersonal,
 ]);
 
 const adminRoutes = routeUtil.getRoutes([
