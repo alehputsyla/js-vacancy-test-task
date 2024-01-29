@@ -1,11 +1,13 @@
-import { z } from 'zod';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { showNotification } from '@mantine/notifications';
-import Head from 'next/head';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { RoutePath } from 'routes';
+import Head from 'next/head';
+
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { Controller, useForm } from 'react-hook-form';
+
+import { showNotification } from '@mantine/notifications';
 import {
   Button,
   TextInput,
@@ -19,6 +21,8 @@ import {
   BackgroundImage,
 } from '@mantine/core';
 
+import { RoutePath } from 'routes';
+
 import { productApi } from 'resources/product';
 
 import { handleError } from 'utils';
@@ -29,13 +33,13 @@ const schema = z.object({
   price: z.number({ required_error: 'Please enter Price' }),
   title: z.string().min(1, 'Please enter Title').max(32),
   quantity: z.number({ required_error: 'Please enter Quantity' }),
-  file: z.any()
+  photo: z.any()
     .refine((file: File) => file, 'Please choose product\'s photo')
     .refine((file: File | undefined) => file && file.size / ONE_MB_IN_BYTES < 2, 'Sorry, you cannot upload a photo larger than 2 MB.')
     .refine((file: File | undefined) => file && ['image/png', 'image/jpg', 'image/jpeg'].includes(file.type), 'Sorry, you can only upload JPG, JPEG or PNG photos.'),
 });
 
-type FormValues = z.infer<typeof schema>;
+type CreateParams = z.infer<typeof schema>;
 
 const ProductsCreate: NextPage = () => {
   const router = useRouter();
@@ -47,38 +51,30 @@ const ProductsCreate: NextPage = () => {
     watch,
     control,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<CreateParams>({
     resolver: zodResolver(schema),
   });
 
   const {
-    mutate: createProduct,
-    isLoading: isCreateProductLoading,
-  } = productApi.useCreate();
+    mutate: create,
+    isLoading: isCreateLoading,
+  } = productApi.useCreate<FormData>();
 
-  const {
-    mutate: uploadPhoto,
-    isLoading: isUploadPhotoLoading,
-  } = productApi.useUploadPhoto();
+  const onSubmit = (submitData: CreateParams) => {
+    const data = new FormData();
+    data.append('file', submitData.photo, submitData.photo.name);
+    data.append('title', submitData.title);
+    data.append('quantity', submitData.quantity.toString());
+    data.append('price', submitData.price.toString());
 
-  const onSubmit = (submitData: FormValues) => {
-    const { file, ...productData } = submitData;
-    const submitFile = new FormData();
-    submitFile.append('file', file, file.name);
-
-    uploadPhoto(submitFile, {
-      onSuccess: ({ photoUrl }) => {
-        createProduct({ ...productData, photoUrl }, {
-          onSuccess: () => {
-            router.push(RoutePath.Products).then(() => {
-              showNotification({
-                title: 'Success',
-                message: 'Your product has been successfully added.',
-                color: 'green',
-              });
-            });
-          },
-          onError: (e) => handleError(e, setError),
+    create(data, {
+      onSuccess: () => {
+        router.push(RoutePath.Products).then(() => {
+          showNotification({
+            title: 'Success',
+            message: 'Your product has been successfully added.',
+            color: 'green',
+          });
         });
       },
       onError: (e) => handleError(e, setError),
@@ -94,16 +90,17 @@ const ProductsCreate: NextPage = () => {
         radius="lg"
         style={{ overflow: 'hidden', pointerEvents: 'auto', cursor: 'pointer' }}
       >
-        {watch('file') && <Image w="100%" h="100%" src={URL.createObjectURL(watch('file'))} />}
+        {watch('photo') && <Image w="100%" h="100%" src={URL.createObjectURL(watch('photo'))} />}
       </BackgroundImage>
       <Button
         style={{ pointerEvents: 'auto' }}
         variant="outline"
         component="div"
         radius="md"
+        size="md"
         fw={500}
       >
-        {watch('file') ? 'Change Photo' : 'Upload Photo'}
+        {watch('photo') ? 'Change Photo' : 'Upload Photo'}
       </Button>
     </Group>
   );
@@ -125,7 +122,7 @@ const ProductsCreate: NextPage = () => {
           <Stack gap="lg">
             <Controller
               control={control}
-              name="file"
+              name="photo"
               render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => (
                 <FileInput
                   onChange={onChange}
@@ -150,12 +147,12 @@ const ProductsCreate: NextPage = () => {
             <TextInput
               {...register('title')}
               label="Title of the product"
-              placeholder="Enter title of the product..."
+              placeholder="Enter title of the product"
               labelProps={{
                 'data-invalid': !!errors.title,
                 mb: 'xs',
+                fw: 600,
               }}
-              radius="md"
               error={errors.title?.message}
             />
 
@@ -174,8 +171,8 @@ const ProductsCreate: NextPage = () => {
                   labelProps={{
                     'data-invalid': !!error,
                     mb: 'xs',
+                    fw: 600,
                   }}
-                  radius="md"
                   error={error?.message}
                 />
               )}
@@ -196,8 +193,8 @@ const ProductsCreate: NextPage = () => {
                   labelProps={{
                     'data-invalid': !!error,
                     mb: 'xs',
+                    fw: 600,
                   }}
-                  radius="md"
                   error={error?.message}
                 />
               )}
@@ -206,8 +203,7 @@ const ProductsCreate: NextPage = () => {
             <Group justify="flex-end" mt={rem(8)}>
               <Button
                 type="submit"
-                loading={isCreateProductLoading && isUploadPhotoLoading}
-                radius="md"
+                loading={isCreateLoading}
               >
                 Upload Product
               </Button>
