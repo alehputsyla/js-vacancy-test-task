@@ -135,8 +135,6 @@ const SignUp: NextPage = () => {
               label="Email Address"
               placeholder="Email address"
               error={errors.email?.message}
-              size="md"
-              radius="md"
               labelProps={{
                 mb: 'xs',
                 fw: 600,
@@ -148,8 +146,6 @@ const SignUp: NextPage = () => {
               label="Password"
               placeholder="Enter password"
               error={errors.password?.message}
-              size="md"
-              radius="md"
               labelProps={{
                 mb: 'xs',
                 fw: 600,
@@ -180,9 +176,6 @@ const SignUp: NextPage = () => {
             loading={isSignUpLoading}
             fullWidth
             mt="xl"
-            size="md"
-            radius="md"
-            fw={500}
           >
             Create Account
           </Button>

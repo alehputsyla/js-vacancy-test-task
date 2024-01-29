@@ -51,8 +51,6 @@ const SignIn: NextPage = () => {
               label="Email Address"
               placeholder="Email address"
               error={errors.email?.message}
-              size="md"
-              radius="md"
               labelProps={{
                 mb: 'xs',
                 fw: 600,
@@ -64,8 +62,6 @@ const SignIn: NextPage = () => {
               label="Password"
               placeholder="Enter password"
               error={errors.password?.message}
-              size="md"
-              radius="md"
               labelProps={{
                 mb: 'xs',
                 fw: 600,
@@ -84,9 +80,6 @@ const SignIn: NextPage = () => {
             type="submit"
             fullWidth
             mt="xl"
-            size="md"
-            radius="md"
-            fw={500}
           >
             Sign in
           </Button>
