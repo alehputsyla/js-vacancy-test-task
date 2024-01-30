@@ -1,9 +1,11 @@
-import Head from 'next/head';
 import { NextPage } from 'next';
+import Head from 'next/head';
+
 import { Button, Center, Image, Paper, rem, Stack, Text, Title } from '@mantine/core';
 
-import { RoutePath } from 'routes';
 import { Link } from 'components';
+
+import { RoutePath } from 'routes';
 
 const PaymentSuccessfull: NextPage = () => (
   <>

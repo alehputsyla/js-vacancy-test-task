@@ -14,8 +14,8 @@ export enum RoutePath {
   Profile = '/profile',
   Products = '/products',
   ProductsCreate = '/products/create',
-  PaymentSuccessfull = '/payment-successfull',
-  PaymentFailed = '/payment-failed',
+  PaymentSuccessfull = '/payment/successfull',
+  PaymentFailed = '/payment/failed',
 
   // Auth paths
   SignIn = '/sign-in',
