@@ -19,6 +19,7 @@ export default Button.extend({
           '--bg': theme.colors[props.color || theme.primaryColor][6],
           '--bg__hover': theme.colors[props.color || theme.primaryColor][4],
           '--bg__active': theme.colors[props.color || theme.primaryColor][8],
+          '--bg__disabled': theme.colors[props.color || theme.primaryColor][3],
         },
       };
     }

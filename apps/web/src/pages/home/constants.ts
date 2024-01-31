@@ -3,7 +3,7 @@ import { ComboboxItem } from '@mantine/core';
 
 import { User } from 'types';
 
-export const PER_PAGE = 5;
+export const PER_PAGE = 6;
 
 export const columns: ColumnDef<User>[] = [
   {

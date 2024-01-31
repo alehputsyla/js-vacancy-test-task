@@ -1,32 +1,40 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
-import Head from 'next/head';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
+
 import { NextPage } from 'next';
+import Head from 'next/head';
+
 import {
-  Select,
   TextInput,
   Group,
-  Title,
   Stack,
-  Skeleton,
   Text,
-  Container,
+  Image,
+  SimpleGrid,
+  rem,
+  Card,
+  Button,
+  Pagination,
+  Center,
+  NumberFormatter,
+  Paper,
+  NumberInput,
   UnstyledButton,
-  Flex,
+  Grid,
+  Skeleton,
+  Container,
+  CloseButton,
 } from '@mantine/core';
 import { useDebouncedValue, useInputState } from '@mantine/hooks';
-import { IconSearch, IconX, IconSelector } from '@tabler/icons-react';
-import { RowSelectionState, SortingState } from '@tanstack/react-table';
-import { DatePickerInput, DatesRangeValue } from '@mantine/dates';
 
-import { userApi } from 'resources/user';
+import { IconArrowsDownUp, IconChevronDown, IconSearch, IconX } from '@tabler/icons-react';
 
-import { Table } from 'components';
+import { productApi } from 'resources/product';
 
-import { PER_PAGE, columns, selectOptions } from './constants';
+import { useCart } from 'hooks';
 
-import classes from './index.module.css';
+import { PER_PAGE } from './constants';
 
-interface UsersListParams {
+interface ProductsListParams {
   page?: number;
   perPage?: number;
   searchValue?: string;
@@ -34,25 +42,45 @@ interface UsersListParams {
     createdOn: 'asc' | 'desc';
   };
   filter?: {
-    createdOn?: {
-      sinceDate: Date | null;
-      dueDate: Date | null;
+    price?: {
+      min: number;
+      max: number;
     };
   };
 }
 
+type FilterPrice = {
+  min?: number,
+  max?: number,
+};
+
+type SortBy = 'newest' | 'oldest';
+
 const Home: NextPage = () => {
   const [search, setSearch] = useInputState('');
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [sortBy, setSortBy] = useState(selectOptions[0].value);
-  const [filterDate, setFilterDate] = useState<DatesRangeValue>();
 
-  const [params, setParams] = useState<UsersListParams>({});
+  const [sortBy, setSortBy] = useState<SortBy>('newest');
 
-  const [debouncedSearch] = useDebouncedValue(search, 500);
+  const [filterPrice, setFilterPrice] = useState<FilterPrice>({});
+  const [filterPriceError, setFilterPriceError] = useState(false);
 
-  const handleSort = useCallback((value: string) => {
+  const [filter, setFilter] = useState<ProductsListParams['filter']>({});
+
+  const [params, setParams] = useState<ProductsListParams>({});
+
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const [debouncedFilter] = useDebouncedValue(filter, 1000);
+
+  const handleResetAllFilters = useCallback(() => {
+    setFilterPrice({});
+    setFilter({});
+    setParams((prev) => ({
+      ...prev,
+      filter: {},
+    }));
+  }, []);
+
+  const handleSort = useCallback((value: SortBy) => {
     setSortBy(value);
     setParams((prev) => ({
       ...prev,
@@ -60,142 +88,245 @@ const Home: NextPage = () => {
     }));
   }, []);
 
-  const handleFilter = useCallback(([sinceDate, dueDate]: DatesRangeValue) => {
-    setFilterDate([sinceDate, dueDate]);
+  const handleFilterPrice = useCallback(({ min, max }: FilterPrice) => {
+    setFilterPrice({ min, max });
 
-    if (!sinceDate) {
-      setParams((prev) => ({
-        ...prev,
-        filter: {},
-      }));
+    if (min && max) {
+      if (min < max) {
+        setFilter({ price: { min, max } });
+        setFilterPriceError(false);
+      } else {
+        setFilter({});
+        setFilterPriceError(true);
+      }
+    } else {
+      setFilter({});
+      setFilterPriceError(false);
     }
-
-    if (dueDate) {
-      setParams((prev) => ({
-        ...prev,
-        filter: { createdOn: { sinceDate, dueDate } },
-      }));
-    }
-  }, []);
+  }, [setFilterPriceError]);
 
   useLayoutEffect(() => {
-    setParams((prev) => ({ ...prev, page: 1, searchValue: debouncedSearch, perPage: PER_PAGE }));
-  }, [debouncedSearch]);
+    setParams((prev) => ({
+      ...prev,
+      page: 1,
+      searchValue: debouncedSearch,
+      perPage: PER_PAGE,
+      filter: debouncedFilter,
+    }));
+  }, [debouncedSearch, debouncedFilter]);
 
-  const { data, isLoading: isListLoading } = userApi.useList(params);
+  const { data, isLoading: isListLoading } = productApi.useList(params);
+
+  const { addToCart, isCartContain } = useCart();
+
+  let products: JSX.Element;
+
+  if (data?.marketplaceCount === 0) {
+    products = (
+      <Center>
+        <Container p={75}>
+          <Text size="xl" c="gray">
+            Marketplace is empty!
+          </Text>
+        </Container>
+      </Center>
+    );
+  } else if (data?.items.length) {
+    products = (
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 2, xl: 3 }}>
+        {data.items.map((product) => (
+          <Card key={product._id} padding="md" radius="lg" withBorder>
+            <Card.Section>
+              <Image
+                src={product.photoUrl}
+                height={218}
+                alt={product.title}
+              />
+            </Card.Section>
+
+            <Text fz="xl" fw={700} mt="md" truncate="end">{product.title}</Text>
+
+            <Group justify="space-between" align="center" mt="md">
+              <Text fz="md" c="dimmed">Price:</Text>
+              <Text fz="xl" fw={700}>
+                <NumberFormatter prefix="$" thousandSeparator value={product.price} />
+              </Text>
+            </Group>
+
+            <Button
+              color="blue"
+              fullWidth
+              mt="lg"
+              radius="md"
+              onClick={() => addToCart(product)}
+              disabled={isCartContain(product._id)}
+            >
+              {isCartContain(product._id) ? 'In cart' : 'Add to cart'}
+            </Button>
+          </Card>
+        ))}
+      </SimpleGrid>
+    );
+  } else {
+    products = (
+      <Container p={75}>
+        <Text size="xl" c="gray">
+          No results found, try to adjust your search or filters.
+        </Text>
+      </Container>
+    );
+  }
 
   return (
     <>
       <Head>
-        <title>Home</title>
+        <title>Marketplace</title>
       </Head>
-      <Stack gap="lg">
-        <Title order={2}>Users</Title>
 
-        <Group wrap="nowrap" justify="space-between">
-          <Group wrap="nowrap">
-            <Skeleton
-              className={classes.inputSkeleton}
-              height={42}
-              radius="sm"
-              visible={isListLoading}
-              width="auto"
-            >
-              <TextInput
-                w={350}
-                size="md"
-                value={search}
-                onChange={setSearch}
-                placeholder="Search by name or email"
-                leftSection={<IconSearch size={16} />}
-                rightSection={search ? (
-                  <UnstyledButton
-                    component={Flex}
-                    display="flex"
-                    align="center"
-                    onClick={() => setSearch('')}
-                  >
-                    <IconX color="gray" />
-                  </UnstyledButton>
-                ) : null}
-              />
-            </Skeleton>
+      <Grid gutter="xl">
+        <Grid.Col span={{ base: 12, lg: 4, xl: 3 }}>
+          <Paper p="lg" radius="lg" withBorder>
+            <Stack gap="lg">
+              <Group justify="space-between">
+                <Text fz="xl" fw={700}>Filters</Text>
+                <Button variant="shell" p={0} onClick={() => handleResetAllFilters()} disabled={data?.marketplaceCount === 0}>
+                  <Text fz="sm" pr={rem(4)}>Reset All</Text>
+                  <IconX size={16} />
+                </Button>
+              </Group>
+              <Stack gap="xs">
+                <Text fz="md" fw={700}>Price</Text>
+                <SimpleGrid cols={2}>
+                  <NumberInput
+                    leftSectionPointerEvents="none"
+                    leftSection={<Text fw={500} fz="sm">From: </Text>}
+                    leftSectionWidth={rem(54)}
+                    suffix="$"
+                    allowNegative={false}
+                    hideControls
+                    fw={500}
+                    fz="sm"
+                    radius="md"
+                    thousandSeparator=" "
+                    value={`${filterPrice.min}`}
+                    onChange={(value) => handleFilterPrice({ max: filterPrice.max, min: +value })}
+                    error={filterPriceError}
+                    disabled={data?.marketplaceCount === 0}
+                  />
+                  <NumberInput
+                    leftSectionPointerEvents="none"
+                    leftSection={<Text fw={500} fz="sm">To: </Text>}
+                    leftSectionWidth={rem(36)}
+                    suffix="$"
+                    allowNegative={false}
+                    hideControls
+                    fw={500}
+                    radius="md"
+                    thousandSeparator=" "
+                    value={`${filterPrice.max}`}
+                    onChange={(value) => handleFilterPrice({ min: filterPrice.min, max: +value })}
+                    error={filterPriceError}
+                    disabled={data?.marketplaceCount === 0}
+                  />
+                </SimpleGrid>
+              </Stack>
+            </Stack>
+          </Paper>
+        </Grid.Col>
 
-            <Skeleton
-              width="auto"
-              height={42}
-              radius="sm"
-              visible={isListLoading}
-            >
-              <Select
-                w={200}
-                size="md"
-                data={selectOptions}
-                value={sortBy}
-                onChange={handleSort}
-                rightSection={<IconSelector size={16} />}
-                comboboxProps={{
-                  withinPortal: false,
-                  transitionProps: {
-                    transition: 'pop-bottom-right',
-                    duration: 210,
-                    timingFunction: 'ease-out',
-                  },
-                }}
-              />
-            </Skeleton>
+        <Grid.Col span={{ base: 12, lg: 8, xl: 9 }}>
+          <Stack gap="lg">
+            <TextInput
+              leftSection={<IconSearch size={16} />}
+              leftSectionPointerEvents="none"
+              placeholder="Type to search..."
+              radius="md"
+              value={search}
+              onChange={setSearch}
+              rightSection={search ? (
+                <UnstyledButton
+                  display="flex"
+                  onClick={() => setSearch('')}
+                >
+                  <IconX color="gray" />
+                </UnstyledButton>
+              ) : null}
+              disabled={data?.marketplaceCount === 0}
+            />
 
-            <Skeleton
-              className={classes.datePickerSkeleton}
-              height={42}
-              radius="sm"
-              visible={isListLoading}
-              width="auto"
-            >
-              <DatePickerInput
-                type="range"
-                size="md"
-                placeholder="Pick date"
-                value={filterDate}
-                onChange={handleFilter}
-              />
-            </Skeleton>
-          </Group>
-        </Group>
+            <Stack>
+              <Group justify="space-between">
+                {data && <Text fw={700}>{`${data.count} results`}</Text>}
 
-        {isListLoading && (
-          <>
-            {[1, 2, 3].map((item) => (
-              <Skeleton
-                key={`sklton-${String(item)}`}
-                height={50}
-                radius="sm"
-                mb="sm"
-              />
-            ))}
-          </>
-        )}
+                <Button
+                  variant="shell"
+                  display="flex"
+                  style={{ alignItems: 'center' }}
+                  c="dimmed"
+                  onClick={() => handleSort(sortBy === 'newest' ? 'oldest' : 'newest')}
+                  disabled={data?.marketplaceCount === 0}
+                >
+                  <IconArrowsDownUp style={{ width: rem(20), height: rem(20) }} />
+                  <Text c="black" fw={500} mx={rem(4)}>{`Sort by ${sortBy}`}</Text>
+                  <IconChevronDown style={{ width: rem(16), height: rem(16) }} />
+                </Button>
+              </Group>
 
-        {data?.items.length ? (
-          <Table
-            columns={columns}
-            data={data.items}
-            dataCount={data.count}
-            rowSelection={rowSelection}
-            setRowSelection={setRowSelection}
-            sorting={sorting}
-            onSortingChange={setSorting}
-            onPageChange={setParams}
-            perPage={PER_PAGE}
-          />
-        ) : (
-          <Container p={75}>
-            <Text size="xl" c="gray">
-              No results found, try to adjust your search.
-            </Text>
-          </Container>
-        )}
-      </Stack>
+              <Group>
+                {filterPrice.min && filterPrice.max && !filterPriceError && (
+                <Paper component={Group} pl={rem(20)} py={rem(10)} pr={rem(17)} radius="xl" withBorder fz="sm" gap={rem(8)} lh={rem(1)}>
+                  <Group gap={0}>
+                    <NumberFormatter value={filterPrice.min} prefix="$" />
+                    -
+                    <NumberFormatter value={filterPrice.max} prefix="$" />
+                  </Group>
+                  <CloseButton bg="dark.3" c="white" radius="xl" size="xs" onClick={() => handleResetAllFilters()} />
+                </Paper>
+                )}
+              </Group>
+            </Stack>
+
+            {products}
+
+            {isListLoading
+                && (
+                <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 2, xl: 3 }}>
+                  {[1, 2, 3, 4, 5, 6].map((key) => (
+                    <Card key={key} padding="md" radius="lg" withBorder>
+                      <Card.Section>
+                        <Skeleton height={218} />
+                      </Card.Section>
+
+                      <Skeleton height={rem(27)} radius="md" mt="md" />
+
+                      <Group justify="space-between" align="center" mt="md">
+                        <Skeleton height={rem(24)} width={rem(64)} radius="md" mt="md" />
+                        <Skeleton height={rem(24)} width={rem(64)} radius="md" mt="md" />
+                      </Group>
+
+                      <Skeleton height={rem(40)} radius="md" mt="md" />
+                    </Card>
+                  ))}
+                </SimpleGrid>
+                )}
+
+          </Stack>
+        </Grid.Col>
+
+        <Grid.Col span={12}>
+          <Center>
+            {data && data.count > PER_PAGE && (
+            <Pagination
+              value={params.page}
+              total={data.totalPages}
+              onChange={(targetPage) => setParams((prev) => ({ ...prev, page: targetPage }))}
+            />
+            )}
+          </Center>
+        </Grid.Col>
+      </Grid>
+
+      <Group grow preventGrowOverflow={false} gap="xl" align="flex-start" />
     </>
   );
 };

@@ -3,6 +3,7 @@
     --bg: inherit;
     --bg__hover: inherit;
     --bg__active: inherit;
+    --bg__disabled: inherit;
 
     background-color: var(--bg);
 
@@ -12,6 +13,11 @@
 
     &:active {
       background-color: var(--bg__active);
+    }
+
+    &:disabled {
+      background-color: var(--bg__disabled);
+      color: var(--mantine-color-white);
     }
   }
 
