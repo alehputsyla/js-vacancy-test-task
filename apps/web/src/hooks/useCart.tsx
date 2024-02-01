@@ -9,7 +9,6 @@ type CartProduct = Pick<Product, '_id' | 'title' | 'price' | 'quantity' | 'photo
 const useCart = () => {
   const [cartValue, setCartValue] = useLocalStorage<CartProduct[]>({
     key: 'cart',
-    defaultValue: [],
   });
 
   const isCartContain = (_id: string) => cartValue && cartValue.some(
@@ -23,12 +22,13 @@ const useCart = () => {
   const addToCart = (product: Product) => {
     const inCart = isCartContain(product._id);
     if (!inCart) {
+      const { _id: id, title, price, quantity, photoUrl } = product;
       const newProduct: CartProduct = {
-        _id: product._id,
-        title: product.title,
-        price: product.price,
-        quantity: product.quantity,
-        photoUrl: product.photoUrl,
+        _id: id,
+        title,
+        price,
+        quantity,
+        photoUrl,
         quantityCart: 1,
       };
       setCartValue((prev) => [...prev, newProduct]);
@@ -36,10 +36,19 @@ const useCart = () => {
   };
 
   const updateInCartQuantity = (_id: string, newQuantity: number) => {
+    const calculateQuantity = (maxValue: number, newValue: number) => {
+      if (newValue <= 0) {
+        return 1;
+      } if (newValue > maxValue) {
+        return maxValue;
+      }
+      return newValue;
+    };
+
     setCartValue((prev) => prev.map((product) => (product._id === _id
       ? {
         ...product,
-        quantityCart: newQuantity <= product.quantity ? newQuantity : product.quantityCart,
+        quantityCart: calculateQuantity(product.quantity, newQuantity),
       }
       : product)));
   };

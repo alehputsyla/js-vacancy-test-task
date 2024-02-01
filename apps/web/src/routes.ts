@@ -14,6 +14,7 @@ export enum RoutePath {
   Profile = '/profile',
   Products = '/products',
   ProductsCreate = '/products/create',
+  Cart = '/cart',
   PaymentSuccessfull = '/payment/successfull',
   PaymentFailed = '/payment/failed',
 
@@ -49,6 +50,10 @@ export const routesConfiguration: RoutesConfiguration = {
     layout: LayoutType.MAIN,
   },
   [RoutePath.ProductsCreate]: {
+    scope: ScopeType.PRIVATE,
+    layout: LayoutType.MAIN,
+  },
+  [RoutePath.Cart]: {
     scope: ScopeType.PRIVATE,
     layout: LayoutType.MAIN,
   },
