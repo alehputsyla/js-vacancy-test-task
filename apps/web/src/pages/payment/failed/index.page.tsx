@@ -1,9 +1,8 @@
 import { NextPage } from 'next';
 import Head from 'next/head';
+import NextLink from 'next/link';
 
 import { Button, Center, Image, Paper, rem, Stack, Text, Title } from '@mantine/core';
-
-import { Link } from 'components';
 
 import { RoutePath } from 'routes';
 
@@ -29,9 +28,9 @@ const PaymentFailed: NextPage = () => (
               Would you like to try again?
             </Text>
           </Stack>
-          <Link type="router" href={RoutePath.MyCart} underline={false}>
+          <NextLink href={RoutePath.Cart}>
             <Button w={rem(186)}>Back to Cart</Button>
-          </Link>
+          </NextLink>
         </Stack>
       </Paper>
     </Center>

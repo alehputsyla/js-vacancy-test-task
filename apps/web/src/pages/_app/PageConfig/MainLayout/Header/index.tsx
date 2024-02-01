@@ -1,9 +1,10 @@
 import { memo, FC } from 'react';
+import NextLink from 'next/link';
+
 import { AppShellHeader as LayoutHeader, Container, rem } from '@mantine/core';
 
 import { accountApi } from 'resources/account';
 
-import { Link } from 'components';
 import { RoutePath } from 'routes';
 
 import { LogoImage } from 'public/images';
@@ -31,9 +32,9 @@ const Header: FC = () => {
         fluid
         pos="relative"
       >
-        <Link type="router" href={RoutePath.Home}>
+        <NextLink href={RoutePath.Home} style={{ display: 'flex' }}>
           <LogoImage style={{ height: rem(40) }} />
-        </Link>
+        </NextLink>
 
         <TopBar />
 

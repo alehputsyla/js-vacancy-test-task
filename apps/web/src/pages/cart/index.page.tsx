@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import { NextPage } from 'next';
+import NextLink from 'next/link';
 
 import {
   Button,
@@ -17,8 +18,6 @@ import {
 import { IconMinus, IconPlus, IconX } from '@tabler/icons-react';
 
 import { useCart } from 'hooks';
-
-import { Link } from 'components';
 
 import { RoutePath } from 'routes';
 
@@ -104,9 +103,9 @@ const Cart: NextPage = () => {
               Go to the marketplace and make purchases.
             </Text>
           </Stack>
-          <Link type="router" href={RoutePath.Home} underline={false}>
+          <NextLink href={RoutePath.Home}>
             <Button>Go to Marketplace</Button>
-          </Link>
+          </NextLink>
         </Stack>
       </Center>
     </Stack>

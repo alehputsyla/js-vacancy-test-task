@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
-import { Burger, Button, Center, Group, Menu, rem } from '@mantine/core';
+import { FC } from 'react';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+
+import { Burger, Button, Center, Group, Menu, rem } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
-import { Link } from 'components';
 import { RoutePath } from 'routes';
 
 import classes from './index.module.css';
@@ -16,17 +17,17 @@ const TopBar: FC = () => {
   return (
     <>
       <Center className={classes.menu} component={Group} gap="xl" visibleFrom="sm">
-        <Link type="router" href={RoutePath.Home} underline={false}>
-          <Button radius="xl" size="md" fw={500} h={rem(40)} variant={router.pathname === RoutePath.Home ? 'shell-active' : 'shell'}>
+        <NextLink href={RoutePath.Home}>
+          <Button radius="xl" size="md" fw={500} h={rem(40)} variant={router.pathname === RoutePath.Home ? 'shell__active' : 'shell'}>
             Marketplace
           </Button>
-        </Link>
+        </NextLink>
 
-        <Link type="router" href={RoutePath.YourProducts} underline={false}>
-          <Button radius="xl" size="md" fw={500} h={rem(40)} variant={router.pathname === RoutePath.YourProducts ? 'shell-active' : 'shell'}>
+        <NextLink href={RoutePath.Products}>
+          <Button radius="xl" size="md" fw={500} h={rem(40)} variant={router.pathname === RoutePath.Products ? 'shell__active' : 'shell'}>
             Your Products
           </Button>
-        </Link>
+        </NextLink>
       </Center>
 
       <Menu>
@@ -35,10 +36,8 @@ const TopBar: FC = () => {
         </Menu.Target>
         <Menu.Dropdown p="xs" style={{ alignItems: 'center' }}>
           <Menu.Item
-            component={Link}
-            type="router"
+            component={NextLink}
             href={RoutePath.Home}
-            underline={false}
           >
             <Button size="md" fw={500} variant="shell" c={router.pathname === RoutePath.Home ? 'var(--mantine-color-black)' : ''}>
               Marketplace
@@ -46,12 +45,10 @@ const TopBar: FC = () => {
           </Menu.Item>
 
           <Menu.Item
-            component={Link}
-            type="router"
-            href={RoutePath.YourProducts}
-            underline={false}
+            component={NextLink}
+            href={RoutePath.Products}
           >
-            <Button size="md" fw={500} variant="shell" c={router.pathname === RoutePath.YourProducts ? 'var(--mantine-color-black)' : ''}>
+            <Button size="md" fw={500} variant="shell" c={router.pathname === RoutePath.Products ? 'var(--mantine-color-black)' : ''}>
               Your Products
             </Button>
           </Menu.Item>

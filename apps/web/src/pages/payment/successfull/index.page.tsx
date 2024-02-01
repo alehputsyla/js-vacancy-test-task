@@ -1,9 +1,8 @@
 import { NextPage } from 'next';
 import Head from 'next/head';
+import NextLink from 'next/link';
 
 import { Button, Center, Image, Paper, rem, Stack, Text, Title } from '@mantine/core';
-
-import { Link } from 'components';
 
 import { RoutePath } from 'routes';
 
@@ -25,9 +24,9 @@ const PaymentSuccessfull: NextPage = () => (
             <Title order={1} size="h2">Payment Successfull</Title>
             <Text c="dimmed" ta="center">Hooray, you have completed your payment!</Text>
           </Stack>
-          <Link type="router" href={RoutePath.Home} underline={false}>
+          <NextLink href={RoutePath.Home}>
             <Button w={rem(186)}>Back to Marketplace</Button>
-          </Link>
+          </NextLink>
         </Stack>
       </Paper>
     </Center>

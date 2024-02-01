@@ -1,9 +1,9 @@
 import { FC } from 'react';
+import NextLink from 'next/link';
 import { Group, Indicator, rem, UnstyledButton } from '@mantine/core';
 import cx from 'clsx';
 import { useRouter } from 'next/router';
 
-import { Link } from 'components';
 import { RoutePath } from 'routes';
 import { useCart } from 'hooks';
 
@@ -22,7 +22,7 @@ const Buttons: FC = () => {
 
   return (
     <Group gap="xl">
-      <Link type="router" href={RoutePath.MyCart} underline={false}>
+      <NextLink href={RoutePath.Cart} style={{ display: 'flex' }}>
         <Indicator
           size={rem(20)}
           inline
@@ -32,12 +32,12 @@ const Buttons: FC = () => {
         >
           <UnstyledButton className={classes.button}>
             <CartIcon className={cx(
-              { [classes.active]: router.pathname === RoutePath.MyCart },
+              { [classes.active]: router.pathname === RoutePath.Cart },
             )}
             />
           </UnstyledButton>
         </Indicator>
-      </Link>
+      </NextLink>
       <UnstyledButton className={classes.button} onClick={() => signOut()}>
         <ExitIcon />
       </UnstyledButton>
