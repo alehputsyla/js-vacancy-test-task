@@ -26,7 +26,7 @@ const Buttons: FC = () => {
         <Indicator
           size={rem(20)}
           inline
-          disabled={cartValue?.length === 0}
+          disabled={!cartValue || cartValue?.length === 0}
           label={cartValue?.length}
           classNames={{ indicator: classes.indicator }}
         >

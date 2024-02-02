@@ -7,8 +7,9 @@ type CartProduct = Pick<Product, '_id' | 'title' | 'price' | 'quantity' | 'photo
 };
 
 const useCart = () => {
-  const [cartValue, setCartValue] = useLocalStorage<CartProduct[]>({
+  const [cartValue, setCartValue, resetCart] = useLocalStorage<CartProduct[]>({
     key: 'cart',
+    defaultValue: [],
   });
 
   const isCartContain = (_id: string) => cartValue && cartValue.some(
@@ -31,7 +32,7 @@ const useCart = () => {
         photoUrl,
         quantityCart: 1,
       };
-      setCartValue((prev) => [...prev, newProduct]);
+      setCartValue((prev) => (prev ? [...prev, newProduct] : [newProduct]));
     }
   };
 
@@ -53,7 +54,7 @@ const useCart = () => {
       : product)));
   };
 
-  return { cartValue, addToCart, isCartContain, removeFromCart, updateInCartQuantity };
+  return { cartValue, addToCart, isCartContain, removeFromCart, updateInCartQuantity, resetCart };
 };
 
 export default useCart;
