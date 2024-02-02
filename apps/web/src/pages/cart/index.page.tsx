@@ -1,13 +1,10 @@
 import Head from 'next/head';
 import { NextPage } from 'next';
-import NextLink from 'next/link';
 
 import {
   Button,
-  Center,
   Image,
   Stack,
-  Title,
   Table,
   Text,
   Group,
@@ -19,9 +16,8 @@ import { IconMinus, IconPlus, IconX } from '@tabler/icons-react';
 
 import { useCart } from 'hooks';
 
-import { RoutePath } from 'routes';
-
 import CartMenu from './components/CartMenu';
+import CartEmptyState from './components/CartEmptyState';
 
 import classes from './index.module.css';
 
@@ -88,26 +84,7 @@ const Cart: NextPage = () => {
   const content = cartValue.length === 0 ? (
     <Stack>
       <CartMenu />
-      <Center mt={84}>
-        <Stack p={20} gap={32} align="center">
-          <Image
-            alt="Cart empty state"
-            src="/images/cart-empty-state-icon.webp"
-            w={206}
-          />
-          <Stack gap={16} align="center">
-            <Title order={1} size={20} lh="28px">Oops, there&apos;s nothing here yet!</Title>
-            <Text c="#767676" size="14px" lh="20px" ta="center">
-              You haven&apos;t made any purchases yet.
-              <br />
-              Go to the marketplace and make purchases.
-            </Text>
-          </Stack>
-          <NextLink href={RoutePath.Home}>
-            <Button>Go to Marketplace</Button>
-          </NextLink>
-        </Stack>
-      </Center>
+      <CartEmptyState />
     </Stack>
   ) : (
     <Grid gutter="xl">
