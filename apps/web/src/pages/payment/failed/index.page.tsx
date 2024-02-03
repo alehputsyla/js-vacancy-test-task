@@ -29,7 +29,7 @@ const PaymentFailed: NextPage = () => (
             </Text>
           </Stack>
           <NextLink href={RoutePath.Cart}>
-            <Button w={rem(186)}>Back to Cart</Button>
+            <Button miw={rem(186)}>Back to Cart</Button>
           </NextLink>
         </Stack>
       </Paper>

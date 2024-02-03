@@ -12,26 +12,27 @@ import {
   Text,
 } from '@mantine/core';
 
+import { orderApi } from 'resources/order';
+
+import dayjs from 'dayjs';
 import CartMenu from '../components/CartMenu';
 import CartEmptyState from '../components/CartEmptyState';
 
 import classes from './index.module.css';
 
-type TestData = {
-  _id: string;
-  title: string,
-  price: number,
-  quantity: number,
-  photoUrl: string,
-  purchaseDate: string,
-}[];
-
-const testData: TestData = [];
-
 const CartHistory: NextPage = () => {
-  if (!testData) return null;
+  const { data } = orderApi.useListPersonal();
 
-  const rows = testData.map((product) => (
+  if (!data) return null;
+
+  const orders = data.items;
+
+  const ordersProducts = orders
+    .map(({ products, paidOn }) => products
+      .map((product) => ({ ...product, paidOn })))
+    .flat();
+
+  const rows = ordersProducts.map((product) => (
     <Table.Tr key={product._id} className={classes.row} style={{ borderWidth: rem(1) }}>
       <Table.Td width="55%">
         <Group>
@@ -56,13 +57,13 @@ const CartHistory: NextPage = () => {
 
       <Table.Td width="10%">
         <Text miw={24} ta="right">
-          {product.purchaseDate}
+          {dayjs(product.paidOn).format('DD.MM.YYYY')}
         </Text>
       </Table.Td>
     </Table.Tr>
   ));
 
-  const content = testData.length === 0 ? (
+  const content = orders.length === 0 ? (
     <Stack>
       <CartMenu />
       <CartEmptyState />

@@ -16,6 +16,10 @@ import { IconMinus, IconPlus, IconX } from '@tabler/icons-react';
 
 import { useCart } from 'hooks';
 
+import { handleError } from 'utils';
+
+import { orderApi } from 'resources/order';
+
 import CartMenu from './components/CartMenu';
 import CartEmptyState from './components/CartEmptyState';
 
@@ -23,6 +27,25 @@ import classes from './index.module.css';
 
 const Cart: NextPage = () => {
   const { cartValue, removeFromCart, updateInCartQuantity } = useCart();
+
+  const {
+    mutate: orderCreate,
+    isLoading: isOrderCreateLoading,
+  } = orderApi.useCreate();
+
+  const handleCreateOrder = () => {
+    if (cartValue) {
+      const cart = cartValue
+        .map(({ _id, quantityCart }) => ({ _id, quantity: quantityCart }));
+
+      orderCreate({ cart }, {
+        onSuccess: ({ url }) => {
+          window.location.href = url;
+        },
+        onError: (e) => handleError(e),
+      });
+    }
+  };
 
   if (!cartValue) return null;
 
@@ -127,7 +150,7 @@ const Cart: NextPage = () => {
               <NumberFormatter prefix="$" thousandSeparator value={cartPrice} />
             </Text>
           </Group>
-          <Button mt="xl" variant="filled" size="sm" fullWidth>
+          <Button mt="xl" variant="filled" size="sm" fullWidth loading={isOrderCreateLoading} onClick={handleCreateOrder}>
             Proceed to Checkout
           </Button>
         </Paper>
