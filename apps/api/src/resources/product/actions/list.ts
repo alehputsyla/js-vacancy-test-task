@@ -34,6 +34,7 @@ async function handler(ctx: AppKoaContext<ValidatedData>) {
   const products = await productService.find(
     {
       $and: [
+        { quantity: { $gt: 0 } },
         {
           $or: [
             { title: { $regex: regExp } },
