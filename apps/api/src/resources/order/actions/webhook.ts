@@ -1,15 +1,8 @@
 import { Next } from 'koa';
 
-import { z } from 'zod';
-
 import { AppKoaContext, AppRouter } from 'types';
 
-import { productService } from 'resources/product';
 import { orderService } from 'resources/order';
-
-import { validateMiddleware } from 'middlewares';
-
-import { ObjectId } from '@paralect/node-mongo';
 
 import { Stripe } from 'stripe';
 
@@ -17,7 +10,9 @@ import config from 'config';
 
 import moment from 'moment';
 
-const stripe = new Stripe(config.STRIPE_SECRET_KEY);
+const stripe = new Stripe(config.STRIPE_SECRET_KEY, {
+  apiVersion: '2023-10-16',
+});
 
 interface ValidatedData {
   event: Stripe.Event;
@@ -49,26 +44,16 @@ async function handler(ctx: AppKoaContext<ValidatedData>) {
 
       if (session.payment_status === 'paid') {
         await orderService.updateOne(
-          { sessionId: session.id },
-          ()=> ({ paidOn: moment.unix(session.created).toDate() }),
+          { sessionId: session.id,
+            paidOn: { $exists: false },
+          },
+          () => ({ paidOn: moment().toDate() }),
         );
       }
 
       break;
     }
 
-    case 'checkout.session.async_payment_succeeded': {
-      const session = event.data.object;
-
-      await orderService.updateOne(
-        { sessionId: session.id },
-        ()=> ({ paidOn: moment(session.created).toDate() }),
-      );
-
-      break;
-    }
-
-    case 'checkout.session.async_payment_failed':
     case 'checkout.session.expired': {
       const session = event.data.object;
 

@@ -15,10 +15,14 @@ import config from 'config';
 
 import moment from 'moment';
 
+import { securityUtil } from 'utils';
+
 const CURRENCY = 'usd';
 const CENTS_IN_USD = 100;
 
-const stripe = new Stripe(config.STRIPE_SECRET_KEY);
+const stripe = new Stripe(config.STRIPE_SECRET_KEY, {
+  apiVersion: '2023-10-16',
+});
 
 const schema = z.object({
   cart: z.array(z.object({
@@ -40,49 +44,52 @@ async function handler(ctx: AppKoaContext<ValidatedData>) {
   cart.sort((a, b) => (a._id > b._id ? 1 : -1));
   results.sort((a, b) => (a._id > b._id ? 1 : -1));
 
-  const products = results.map(({ _id, title, photoUrl, price }, index) => ({
-    _id, title, photoUrl, price, quantity: cart[index].quantity,
-  }));
+  const products = results
+    .map(({ _id, title, photoUrl, price }, index) => ({
+      _id, title, photoUrl, price, quantity: cart[index].quantity,
+    }));
 
-  const check = results
-    .some(({ quantity }, index) => quantity > 0 && quantity >= cart[index].quantity);
+  const checkOrders = await orderService.findOne({
+    userId: user._id,
+    paidOn: { $exists: false },
+    products: {
+      $size: products.length,
+      $all: products.map(p => ({ $elemMatch: p })),
+    },
+  });
 
-  if (!check) {
-    const checkOrders = await orderService.findOne({
-      userId: user._id,
-      products: {
-        $elemMatch: {
-          $or: products.map(product => ({ ...product })),
-        },
-      },
-    });
-
-    ctx.assertError(checkOrders, 'Items in the cart has invalid id or quantity' );
-
-    const retrieve = await stripe.checkout.sessions.retrieve(checkOrders.sessionId);
-
-    ctx.assertError(retrieve.url, 'Items in the cart has invalid id or quantity' );
+  if (checkOrders) {
+    const { sessionUrl } = checkOrders;
 
     ctx.body = {
-      url: retrieve.url,
+      url: sessionUrl,
     };
+
   } else {
-    const lineItems = results.map(({ title, photoUrl, _id, price }, index) => (
-      {
-        price_data: {
-          currency: CURRENCY,
-          product_data: {
-            name: title,
-            images: [photoUrl],
-            metadata: {
-              id: _id,
+    const check = results
+      .some(({ quantity }, index) => quantity > 0 && quantity >= cart[index].quantity);
+
+    ctx.assertError(check, 'Items in the cart has invalid id or quantity' );
+    
+    const lineItems = results
+      .map(({ title, photoUrl, _id, price }, index) => (
+        {
+          price_data: {
+            currency: CURRENCY,
+            product_data: {
+              name: title,
+              images: [photoUrl],
+              metadata: {
+                id: _id,
+              },
             },
+            unit_amount: price * CENTS_IN_USD,
           },
-          unit_amount: price * CENTS_IN_USD,
-        },
-        quantity: cart[index].quantity,
-      }
-    ));
+          quantity: cart[index].quantity,
+        }
+      ));
+
+    const cancelToken = await securityUtil.generateSecureToken();
 
     const session = await stripe.checkout.sessions.create({
       customer_email: user.email,
@@ -93,7 +100,7 @@ async function handler(ctx: AppKoaContext<ValidatedData>) {
       },
       mode: 'payment',
       success_url: `${config.WEB_URL}/payment/successfull`,
-      cancel_url: `${config.WEB_URL}/payment/failed`,
+      cancel_url: `${config.WEB_URL}/payment/failed?token=${cancelToken}`,
       expires_at: moment().add(30, 'minutes').unix(),
     });
 
@@ -101,6 +108,8 @@ async function handler(ctx: AppKoaContext<ValidatedData>) {
       userId: user._id,
       products,
       sessionId: session.id,
+      sessionUrl: session.url || '',
+      cancelToken,
     });
 
     ctx.body = {

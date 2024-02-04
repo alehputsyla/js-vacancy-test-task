@@ -5,6 +5,8 @@ import { productSchema } from './product.schema';
 
 export const orderSchema = dbSchema.extend({
   sessionId: z.string(),
+  sessionUrl: z.string(),
+  cancelToken: z.string(),
   products: z.array(
     productSchema.pick({ _id: true, price: true, quantity: true, title: true, photoUrl: true }),
   ),

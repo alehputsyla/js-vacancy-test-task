@@ -17,7 +17,9 @@ eventBus.on(`${ORDERS}.created`, async (data: InMemoryEvent<Order>) => {
     const updatePromises = products.map( async ({ _id, quantity: cartQuantity }) => {
       await productService.updateOne(
         { _id },
-        ({ quantity: productQuantity }) => ({ quantity: productQuantity - cartQuantity }), 
+        ({ quantity: productQuantity }) => ({
+          quantity: productQuantity - cartQuantity,
+        }),
       );
     });
 

@@ -9,7 +9,6 @@ async function handler(ctx: AppKoaContext) {
     {
       $and: [
         { userId: user._id },
-        { paidOn: { $ne: null } },
       ],
     },
     {},
