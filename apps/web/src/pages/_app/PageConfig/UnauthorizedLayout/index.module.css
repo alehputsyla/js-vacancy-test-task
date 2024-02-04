@@ -1,15 +1,12 @@
 .images {
-    --multiplier: calc(100vw / 1440);
-    position: relative;
-    margin-left: calc(76 * var(--multiplier));
-    margin-right: calc(76 * var(--multiplier));
-    margin-bottom: calc(76 * var(--multiplier));
+    --multiplier: 1px;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    @media (min-width: 1440px) {
-        --multiplier: 1px;
-        margin-left: auto;
-        margin-right: auto;
+    @media (max-width: 1440px) {
+        --multiplier: calc(100vw / 1440);
     }
 
     @media (max-width: 767px) {
@@ -17,31 +14,50 @@
     }
 }
 
-.images .shop {
+.images .frame {
     position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: content-box;
+
+    height: calc(300 * var(--multiplier));
+    width: calc(448 * var(--multiplier));
+
+    padding-left: calc(50 * var(--multiplier));
+    padding-right: calc(50 * var(--multiplier));
+
+    padding-bottom: calc(39 * var(--multiplier));
+}
+
+.images .shop {
     z-index: 2;
 
-    @media (min-width: 1440px) {
-        --multiplier: 1px;
-        margin-left: auto;
-        margin-right: auto;
-        height: calc(300 * var(--multiplier));
-    }
+    height: calc(300 * var(--multiplier));
+    width: calc(448 * var(--multiplier));
 }
 
 .images .card1 {
     position: absolute;
-    bottom: calc(-39 * var(--multiplier));
-    left: calc(-67 * var(--multiplier));
+
+    bottom: calc(10 * var(--multiplier));
+    left: calc(14 * var(--multiplier));
+
     transform: rotate(-15deg);
+
     width: calc(100 * var(--multiplier));
 }
 
 .images .card2 {
     position: absolute;
-    bottom: calc(-39 * var(--multiplier));
-    right: calc(-67 * var(--multiplier));
+
+    bottom: calc(10 * var(--multiplier));
+    right: calc(14 * var(--multiplier));
+
     transform: rotate(15deg);
+
     width: calc(100 * var(--multiplier));
 }
 

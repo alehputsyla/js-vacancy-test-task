@@ -1,9 +1,10 @@
 import { FC, ReactElement } from 'react';
-import { SimpleGrid, Center, Stack, rem, Group, Avatar, Text, Title, Image, Box } from '@mantine/core';
+import { SimpleGrid, Center, Stack, rem, Group, Avatar, Text, Title, Image } from '@mantine/core';
 
 import { LogoImage } from 'public/images';
 import { RoutePath } from 'routes';
-import { Link } from 'components';
+
+import NextLink from 'next/link';
 
 import classes from './index.module.css';
 
@@ -24,30 +25,32 @@ const UnauthorizedLayout: FC<UnauthorizedLayoutProps> = ({ children }) => (
 
     <Center p="xl">
       <Stack gap="xl" bg="#F4F4F4" miw="100%" mih="100%" justify="flex-end" style={{ borderRadius: rem(12) }} px="xl" pt={rem(120)} pb={rem(46)} pos="relative">
-        <Link type="router" href={RoutePath.Home}>
+        <NextLink href={RoutePath.Home}>
           <LogoImage style={{ position: 'absolute', top: rem(40), left: rem(40) }} />
-        </Link>
+        </NextLink>
 
-        <Box className={classes.images}>
-          <Image
-            alt="Item card 1"
-            src="/images/shop-item-card-1.webp"
-            radius="md"
-            className={classes.card1}
-          />
-          <Image
-            alt="Shop"
-            src="/images/shop.webp"
-            radius="md"
-            className={classes.shop}
-          />
-          <Image
-            alt="Item card 2"
-            src="/images/shop-item-card-2.webp"
-            radius="md"
-            className={classes.card2}
-          />
-        </Box>
+        <Center className={classes.images}>
+          <div className={classes.frame}>
+            <Image
+              alt="Shop"
+              src="/images/shop.webp"
+              radius="md"
+              className={classes.shop}
+            />
+            <Image
+              alt="Item card 1"
+              src="/images/shop-item-card-1.webp"
+              radius="md"
+              className={classes.card1}
+            />
+            <Image
+              alt="Item card 2"
+              src="/images/shop-item-card-2.webp"
+              radius="md"
+              className={classes.card2}
+            />
+          </div>
+        </Center>
 
         <Stack>
           <Title order={2} size="h1" fw={700}>
