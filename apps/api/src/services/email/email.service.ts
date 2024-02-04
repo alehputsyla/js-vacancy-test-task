@@ -1,53 +1,50 @@
 import config from 'config';
-import sendgrid from '@sendgrid/mail';
+
+import nodemailer from 'nodemailer';
 
 import { renderEmailHtml, Template } from 'mailer';
 
-import { From, EmailServiceConstructorProps, SendTemplateParams, SendSendgridTemplateParams } from './email.types';
+import { From, EmailServiceConstructorProps, SendTemplateParams } from './email.types';
 
 class EmailService {
-  apiKey: string | undefined;
+  transporter: nodemailer.Transporter;
 
   from: From;
 
-  constructor({ apiKey, from }: EmailServiceConstructorProps) {
-    this.apiKey = apiKey;
+  constructor({ from, port, pass, user, host }: EmailServiceConstructorProps) {
     this.from = from;
 
-    if (apiKey) sendgrid.setApiKey(apiKey);
-  }
-
-  async sendTemplate<T extends Template>({ to, subject, template, params }: SendTemplateParams<T>) {
-    if (!this.apiKey) return null;
-
-    const html = await renderEmailHtml({ template, params });
-
-    return sendgrid.send({
-      from: this.from,
-      to,
-      subject,
-      html,
+    this.transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: true,
+      auth: {
+        user,
+        pass,
+      },
     });
   }
 
-  async sendSendgridTemplate({ to, subject, templateId, dynamicTemplateData }: SendSendgridTemplateParams) {
-    if (!this.apiKey) return null;
+  async sendTemplate<T extends Template>({ to, subject, template, params }: SendTemplateParams<T>) {
+    const html = await renderEmailHtml({ template, params });
 
-    return sendgrid.send({
-      from: this.from,
+    return this.transporter.sendMail({
+      from: `${this.from.name} <${this.from.email}>`,
       to,
       subject,
-      templateId,
-      dynamicTemplateData,
+      html,
     });
   }
 }
 
 
 export default new EmailService({
-  apiKey: config.SENDGRID_API_KEY,
+  host: config.EMAIL_SERVER_HOST,
+  port: config.EMAIL_SERVER_PORT,
+  user: config.EMAIL_SERVER_USER,
+  pass: config.EMAIL_SERVER_PASSWORD,
   from: {
-    email: 'notifications@ship.com',
-    name: 'Ship',
+    email: config.EMAIL_FROM,
+    name: 'Chuvaaak.ru',
   },
 });
